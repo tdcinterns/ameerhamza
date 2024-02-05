@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Author {
+  id  String  @id @default(uuid())
+
+  name String?
+
+  email String @unique
+
+  password String
+
+  contacts  AuthorContact[]
+
+  books     Book[]
+  
+}
+
+model AuthorContact {
+  id          String @id @default(uuid())
+
+  contactType String
+
+  address     String
+
+  phone       String
+
+  author      Author @relation(fields: [authorID], references: [id], onDelete: Cascade)
+
+  authorID    String
+}
+
+
+model Book {
+  id    String @id @default(uuid())
+
+  title String
+
+  author      Author @relation(fields: [authorID], references: [id] ,onDelete: Cascade)
+
+  authorID    String
+
+  genre       Genre @relation(fields: [genreID],references: [id], onDelete: Cascade)
+
+  genreID     String
+
+  status      BookStatus?
+
+}
+
+
+model Genre {
+  id   String @id @default(uuid())
+
+  type String
+
+  books  Book[]  
+}
+
+
+model BookStatus {
+    id    String @id @default(uuid())
+
+    totalRented  Int
+
+    totalSold     Int
+
+    book  Book @relation(fields: [bookID],references: [id], onDelete: Cascade)
+
+    bookID String  @unique
+}
